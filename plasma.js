@@ -1,6 +1,7 @@
 var plasmaWidth = 196, plasmaHeight = 128;
 var len = plasmaWidth*plasmaHeight;
 var idata, data = [];
+var palette = cachePalette(16,1,0.5);
 
 function load() {
 	canvas = document.createElement("canvas");
@@ -29,17 +30,17 @@ function load() {
 	setInterval(step,1000/60);
 }
 
-var t = 0, scale = 0.2;
+var t = 0, scale = 0.1;
 function step() {
 	for (var x=0; x<plasmaWidth; x++) {
 		for (var y=0; y<plasmaHeight; y++) {
-			var val = Math.sin((x+t)*scale);
+			var val = Math.sin(((x+y)*0.5+t)*scale);
 			val    += Math.sin((x+t*0.5)*scale) * Math.cos((y-t*0.3)*scale);
 			val    += Math.cos((y*0.1+t*0.2)*scale);
-			val    += Math.sin(Math.sqrt((x*x+y*y)*scale*0.1)+t*0.1);
+			val    += Math.sin(Math.sqrt((x*x+y*y)*scale*0.2)+t*0.1);
 			val    /= 4;
 			
-			putcol(x,y,hsl2rgb(val,1,0.5));
+			putcol(x,y,colFromPal(val+t));
 		}
 	}
 	
@@ -56,10 +57,25 @@ function draw() {
 
 function putcol(x,y,rgb) {
 	var ind = ((y*plasmaWidth)+x)*4;
-	data[ind+0] = rgb[0];
-	data[ind+1] = rgb[1];
-	data[ind+2] = rgb[2];
+	data[ind+0] = ~~rgb[0];
+	data[ind+1] = ~~rgb[1];
+	data[ind+2] = ~~rgb[2];
 	data[ind+3] = 255;
+}
+
+//color functions
+function cachePalette(numCols, sat, lum) {
+	var pal = [];
+	for (var i=0; i<numCols; i++) {
+		pal[i] = hsl2rgb(i/numCols,sat,lum);
+	}
+	return pal;
+}
+
+function colFromPal(val) {
+	val = Math.abs(val)%1;
+	var ind = ~~(val*palette.length);
+	return palette[ind];
 }
 
 function hsl2rgb(h, s, l){
