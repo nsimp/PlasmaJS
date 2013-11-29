@@ -1,4 +1,4 @@
-var plasmaWidth = 196, plasmaHeight = 128;
+var plasmaWidth = ~~(window.innerWidth/8), plasmaHeight = ~~(window.innerHeight/8);
 var len = plasmaWidth*plasmaHeight;
 var idata, data = [];
 var palette = cachePalette(16,1,0.5);
